@@ -10,7 +10,7 @@ on:
   #  branches: 
   #    - master
   schedule:
-    - cron: "0 2 * * *"
+    - cron: "30 22 * * *" # 北京时间上午06:30
   watch:
     types: [started]
    
