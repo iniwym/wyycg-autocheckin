@@ -7,6 +7,7 @@ tele_enable = False
 sc_enable = False
 qq_enable = False
 pp_enable = False
+lark_enable = False
 sign_url = 'https://n.cg.163.com/api/v2/sign-today'
 current = 'https://n.cg.163.com/api/v2/client-settings/@current'
 
@@ -17,6 +18,7 @@ teletoken = sys.argv[3]
 sckey = sys.argv[4]
 qqkey = sys.argv[5]
 ppkey = sys.argv[6]
+lark_key = sys.argv[7]
 
 if cookies == "" or cookies == []:
     print('[网易云游戏自动签到]未设置cookie，正在退出……')
@@ -42,6 +44,11 @@ if ppkey != '':
     print('PushPlus推送已配置！')
 else:
     print('未配置PushPlus推送！')
+if lark_key != "":
+    lark_enable = True
+    print('飞书机器人推送已配置！')
+else:
+    print('未配置飞书机器人推送！')
 
 class ScriptRunError(Exception):
     print("[网易云游戏自动签到]脚本运行错误，具体请参见日志！")
@@ -103,7 +110,7 @@ def scsend(SCKEY, message):
         print('正在使用ServerChan进行消息推送……')
         r.get(url=sc_url)
         print('ServerChan消息推送完成！')
-        
+
 def qqsend(QQKEY, message):
     qq_url = 'https://push.xuthus.cc/send/{}?c=网易云游戏自动签到脚本\n{}'.format(QQKEY, message)
     if qq_enable:
@@ -117,6 +124,25 @@ def ppsend(PPKEY, message):
         print('正在使用PushPlus进行消息推送……')
         r.get(url=pp_url)
         print('PushPlus消息推送完成')
+
+# 使用飞书机器人推送结果
+def larkBotMessage(lark_key, message):
+
+    msg = {
+        "msg_type": "text",
+        "content": {"text": "title: " + "网易云游戏自动签到脚本" + "; result: " + message}
+    }
+    webhook_url="https://open.feishu.cn/open-apis/bot/v2/hook/" + lark_key
+    headers = {
+        "Content-type": "application/json",
+        "charset":"utf-8"
+    }
+    msg_encode=json.dumps(msg,ensure_ascii=True).encode("utf-8")
+
+    if lark_enable:
+        print('正在使用飞书机器人进行消息推送……')
+        reponse=requests.post(url=webhook_url,data=msg_encode,headers=headers)
+        print('飞书机器人消息推送完成！')
 
 if __name__ == "__main__":
     print('检测到{}个账号，即将开始签到！'.format(len(cookies)))
@@ -201,11 +227,19 @@ if __name__ == "__main__":
     GamerNoTitle: https://bili33.top
     网易云游戏自动签到脚本: https://github.com/GamerNoTitle/wyycg-autocheckin
     '''.format(len(success), len(failure), len(cookies), outputmsg)
+    larkinfomsg = '''
+    今日签到结果如下：
+    成功数量：{0}/{2}
+    失败数量：{1}/{2}
+    具体情况如下：
+    {3}
+    '''.format(len(success), len(failure), len(cookies), outputmsg)
 
     send(teleid, teleinfomsg)
     scsend(sckey, scinfomsg)
     qqsend(qqkey, qqinfomsg)
     ppsend(ppkey, ppinfomsg)
+    larkBotMessage(lark_key, larkinfomsg)
     print(teleinfomsg)
     if (len(failure) != 0):
         raise ScriptRunError
