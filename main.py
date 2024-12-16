@@ -141,7 +141,7 @@ def larkBotMessage(lark_key, message):
 
     if lark_enable:
         print('正在使用飞书机器人进行消息推送……')
-        reponse=requests.post(url=webhook_url,data=msg_encode,headers=headers)
+        reponse=r.post(url=webhook_url,data=msg_encode,headers=headers)
         print('飞书机器人消息推送完成！')
 
 if __name__ == "__main__":
