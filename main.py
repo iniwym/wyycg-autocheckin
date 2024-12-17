@@ -130,7 +130,7 @@ def larkBotMessage(lark_key, message):
 
     msg = {
         "msg_type": "text",
-        "content": {"text": "title: " + "网易云游戏自动签到脚本" + "; result: " + message}
+        "content": {"text": "网易云游戏自动签到任务" + message}
     }
     webhook_url="https://open.feishu.cn/open-apis/bot/v2/hook/" + lark_key
     headers = {
